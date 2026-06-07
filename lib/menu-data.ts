@@ -1,14 +1,14 @@
-const MENU_MASTERS = [
-  { id: 'super-categories', label: 'Super Categories', href: 'super-categories.html' },
-  { id: 'categories', label: 'Categories', href: 'categories.html' },
-  { id: 'sub-categories', label: 'Sub-Categories', href: 'sub-categories.html' },
-  { id: 'items', label: 'Items', href: 'items.html' },
-  { id: 'addons', label: 'Addons', href: 'addons.html' },
-  { id: 'variants', label: 'Variants', href: 'variants.html' },
-  { id: 'submenu', label: 'Submenu', href: 'submenu.html' },
+export const MENU_MASTERS = [
+  { id: 'super-categories', label: 'Super Categories', href: '/menu/super-categories' },
+  { id: 'categories', label: 'Categories', href: '/menu/categories' },
+  { id: 'sub-categories', label: 'Sub-Categories', href: '/menu/sub-categories' },
+  { id: 'items', label: 'Items', href: '/menu/items' },
+  { id: 'addons', label: 'Addons', href: '/menu/addons' },
+  { id: 'variants', label: 'Variants', href: '/menu/variants' },
+  { id: 'submenu', label: 'Submenu', href: '/menu/submenu' },
 ];
 
-const CATEGORIES_DATA = [
+export const CATEGORIES_DATA = [
   { name: 'Maggi - DM', onlineDisplayName: '--', itemCount: 5 },
   { name: 'Sides - DM', onlineDisplayName: '--', itemCount: 5 },
   { name: 'Drinks - DM', onlineDisplayName: '--', itemCount: 10 },
@@ -61,7 +61,7 @@ const CATEGORIES_DATA = [
   { name: 'Non Veg Snacks -N', onlineDisplayName: '--', itemCount: 18 },
 ];
 
-const SUB_CATEGORIES_DATA = [
+export const SUB_CATEGORIES_DATA = [
   { name: 'Double scoop', category: 'ICE CREAM - A' },
   { name: 'BURGERS', category: 'Pilot Chef - A' },
   { name: 'PASTA', category: 'Pilot Chef - A' },
@@ -86,7 +86,7 @@ const SUB_CATEGORIES_DATA = [
   { name: 'Fine Dine Veg', category: 'Fine Dine' },
 ];
 
-const ITEMS_DATA = [
+export const ITEMS_DATA = [
   { name: 'French Fries Peri - Peri - Z', displayName: 'French Fries Peri - Peri', category: 'Blue Valley Special - Z', shortCode: '--', basePrice: 180, tax: 'GST 0%', mrp: 180 },
   { name: 'Roti Basket Tokri - Z', displayName: 'Roti Basket Tokri', category: 'Roti - Z', shortCode: '--', basePrice: 250, tax: 'GST 0%', mrp: 250 },
   { name: 'Kashmiri Naan - Z', displayName: 'Kashmiri Naan', category: 'Roti - Z', shortCode: '--', basePrice: 100, tax: 'GST 0%', mrp: 100 },
@@ -123,7 +123,7 @@ const ITEMS_DATA = [
   { name: 'Rajbhag Ice Cream - Z', displayName: 'Rajbhag Ice Cream', category: 'Ice Cream + Shake - Z', shortCode: '--', basePrice: 80, tax: 'GST 0%', mrp: 80 },
 ];
 
-const ADDONS_DATA = [
+export const ADDONS_DATA = [
   { name: 'Adventure4', displayName: 'Upgrade Combo', items: 'Add 2 French Fries 160/- - DM, All Paneer Momos 30/- - DM' },
   { name: 'Adventure2', displayName: 'Select One', items: '8Pcs Pan Tossed Momos - DM, 8Pcs Tandoori Momos - DM' },
   { name: 'Me time bites', displayName: 'Add Ons', items: '1 Coke (Reg) - DM, 1 French Fries - DM, 1 French Fries Peri Peri - DM', readMore: true },
@@ -139,7 +139,7 @@ const ADDONS_DATA = [
   { name: 'tub small', displayName: 'tub small', items: '-' },
 ];
 
-const VARIANTS_DATA = [
+export const VARIANTS_DATA = [
   '(Paneer)',
   '(Veg)',
   'Medium',
@@ -156,3 +156,4 @@ const VARIANTS_DATA = [
   'Large',
   'Small',
 ];
+

@@ -1,10 +1,23 @@
 {
-  "name": "ciferon-billing-login",
-  "version": "1.0.0",
+  "name": "ciferon-billing-station",
+  "version": "2.0.0",
   "private": true,
-  "description": "Ciferon Billing Station login page clone",
+  "description": "Ciferon Billing Station admin UI clone (Next.js + React)",
   "scripts": {
-    "start": "npx --yes serve . -l 8765",
-    "dev": "npx --yes live-server --port=8765 --no-browser"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "typescript": "^5.8.3"
   }
 }
