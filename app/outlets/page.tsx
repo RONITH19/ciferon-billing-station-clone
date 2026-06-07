@@ -4,7 +4,7 @@ import AuthGuard from '@/components/AuthGuard';
 import DashboardShell from '@/components/DashboardShell';
 import ManageLink from '@/components/ManageLink';
 
-const outlets = ['Ciferon Trial 2', 'Warehouse - Trial'];
+const outlets = ['shobox Trial 2', 'Warehouse - Trial'];
 
 export default function OutletsPage() {
   return (
@@ -12,7 +12,7 @@ export default function OutletsPage() {
       <div className="dashboard-body" data-page="outlets">
         <DashboardShell title="Outlets">
           <main className="dashboard-content">
-            <h2 className="content-heading">Ciferon Trial 2</h2>
+            <h2 className="content-heading">shobox Trial 2</h2>
 
             <div className="outlet-grid">
               {outlets.map((name) => (

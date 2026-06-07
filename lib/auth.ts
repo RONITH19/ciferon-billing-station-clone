@@ -1,4 +1,4 @@
-export const AUTH_KEY = 'ciferon_logged_in';
+export const AUTH_KEY = 'shobox_logged_in';
 
 export function isLoggedIn(): boolean {
   if (typeof window === 'undefined') return false;

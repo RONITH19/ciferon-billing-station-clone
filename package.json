@@ -1,8 +1,8 @@
 {
-  "name": "ciferon-billing-station",
+  "name": "shobox-billing-station",
   "version": "2.0.0",
   "private": true,
-  "description": "Ciferon Billing Station admin UI clone (Next.js + React)",
+  "description": "shobox Billing Station admin UI clone (Next.js + React)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

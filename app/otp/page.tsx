@@ -45,7 +45,7 @@ export default function OtpPage() {
       <div className="card">
         <section className="login-panel">
           <h1 className="login-title">Sign in</h1>
-          <p className="login-subtitle">to access Ciferon Billing Station</p>
+          <p className="login-subtitle">to access shobox Billing Station</p>
 
           <form className="login-form" onSubmit={handleSubmit}>
             <input type="email" name="email" placeholder="Email" className="form-input" autoComplete="email" required />

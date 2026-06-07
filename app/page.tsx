@@ -40,13 +40,13 @@ export default function LoginPage() {
       <div className="card">
         <section className="login-panel">
           <h1 className="login-title">Sign in</h1>
-          <p className="login-subtitle">to access Ciferon Billing Station</p>
+          <p className="login-subtitle">to access shobox Billing Station</p>
 
           <form className="login-form" onSubmit={handleSubmit}>
             <input type="email" name="email" placeholder="Email" className="form-input" autoComplete="email" required />
             <input type="password" name="password" placeholder="Password" className="form-input" autoComplete="current-password" required />
             <button type="submit" className="btn-primary">
-              Login into Ciferon
+              Login into shobox
             </button>
           </form>
 

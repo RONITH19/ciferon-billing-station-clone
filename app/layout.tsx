@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Ciferon Billing Station',
-  description: 'Ciferon Billing Station admin UI clone',
+  title: 'shobox Billing Station',
+  description: 'shobox Billing Station admin UI clone',
   icons: {
     icon: '/assets/favicon.svg',
   },
