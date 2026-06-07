@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login with OTP - Ciferon Billing Station</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <div class="card">
+      <section class="login-panel">
+        <h1 class="login-title">Sign in</h1>
+        <p class="login-subtitle">to access Ciferon Billing Station</p>
+
+        <form id="otp-form" class="login-form" action="#" method="post">
+          <input type="email" name="email" placeholder="Email" class="form-input" autocomplete="email" required />
+          <div id="otp-field" class="otp-field" hidden>
+            <input type="text" name="otp" placeholder="Enter OTP" class="form-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" />
+          </div>
+          <button type="submit" id="send-otp-btn" class="btn-primary">Send OTP</button>
+        </form>
+
+        <a href="index.html" class="otp-link">Login with Email &amp; Password</a>
+
+        <div class="divider">
+          <span class="divider-line"></span>
+          <span class="divider-text">Or</span>
+          <span class="divider-line"></span>
+        </div>
+
+        <p class="support-text">Call us on 9112239021 for further assistance</p>
+      </section>
+
+      <section class="promo-panel">
+        <div class="illustration">
+          <img src="assets/illustration.svg" alt="" width="280" height="175" />
+        </div>
+
+        <h2 class="promo-title">An experience <span class="highlight">you'll love</span></h2>
+        <p class="promo-text">
+          Our refreshed approach to restaurant software has enabled over 8500+ restaurants big and small across the globe to exceed guest and staff expectations.
+        </p>
+      </section>
+    </div>
+
+    <footer class="page-footer">
+      &copy; 2023, Webmilez Infotech Pvt. Ltd. All Rights Reserved.
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

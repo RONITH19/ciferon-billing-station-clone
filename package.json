@@ -1,0 +1,10 @@
+{
+  "name": "ciferon-billing-login",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ciferon Billing Station login page clone",
+  "scripts": {
+    "start": "npx --yes serve . -l 8765",
+    "dev": "npx --yes live-server --port=8765 --no-browser"
+  }
+}
