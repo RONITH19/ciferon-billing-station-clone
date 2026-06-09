@@ -1,338 +1,143 @@
 'use client';
 
-import {
-  ADDONS_DATA,
-  CATEGORIES_DATA,
-  ITEMS_DATA,
-  SUB_CATEGORIES_DATA,
-  VARIANTS_DATA,
-} from '@/lib/menu-data';
-import {
-  EmptyState,
-  LoadingState,
-  Pagination,
-  RowActions,
-  SearchBox,
-  SortIcon,
-  useSearchFilter,
-} from './MenuTableParts';
+import ResourcePanel, { type PanelConfig, type Row } from './ResourcePanel';
 
-function SuperCategoriesPanel() {
-  return (
-    <section className="data-panel">
-      <div className="data-panel-toolbar">
-        <h2 className="data-panel-title">Super Categories</h2>
-        <button type="button" className="btn-new">
-          New
-        </button>
-      </div>
-      <div className="data-panel-card">
-        <SearchBox />
-        <div className="data-table">
-          <div className="data-table-head cols-super">
-            <div className="data-col data-col-name">
-              Name <SortIcon />
-            </div>
-            <div className="data-col data-col-order">DisplayOrder</div>
-            <div className="data-col data-col-action">Action</div>
-          </div>
-          <EmptyState />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CategoriesPanel() {
-  const { setQuery, filtered } = useSearchFilter(CATEGORIES_DATA, (row) => row.name);
-
-  return (
-    <section className="data-panel">
-      <div className="data-panel-toolbar">
-        <h2 className="data-panel-title">Categories</h2>
-        <button type="button" className="btn-new">
-          New
-        </button>
-      </div>
-      <div className="data-panel-card">
-        <SearchBox onSearch={setQuery} />
-        <div className="data-table">
-          <div className="data-table-head cols-categories">
-            <div className="data-col">
-              Name <SortIcon />
-            </div>
-            <div className="data-col">
-              Online Display Name <SortIcon />
-            </div>
-            <div className="data-col data-col-center">
-              No. Of Items <SortIcon />
-            </div>
-            <div className="data-col data-col-action">Action</div>
-          </div>
-          <div className="data-table-body">
-            {filtered.map((row) => (
-              <div key={row.name} className="data-table-row cols-categories">
-                <div className="data-col">{row.name}</div>
-                <div className="data-col data-col-muted">{row.onlineDisplayName}</div>
-                <div className="data-col data-col-center">{row.itemCount}</div>
-                <div className="data-col data-col-actions">
-                  <RowActions />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SubCategoriesPanel() {
-  const { setQuery, filtered } = useSearchFilter(SUB_CATEGORIES_DATA, (row) => `${row.name} ${row.category}`);
-
-  return (
-    <section className="data-panel">
-      <div className="data-panel-toolbar">
-        <h2 className="data-panel-title">Sub-Categories</h2>
-        <button type="button" className="btn-new">
-          New
-        </button>
-      </div>
-      <div className="data-panel-card">
-        <SearchBox onSearch={setQuery} />
-        <div className="data-table">
-          <div className="data-table-head cols-sub">
-            <div className="data-col">
-              Name <SortIcon />
-            </div>
-            <div className="data-col">
-              Category <SortIcon />
-            </div>
-            <div className="data-col data-col-action">Action</div>
-          </div>
-          <div className="data-table-body">
-            {filtered.map((row) => (
-              <div key={`${row.name}-${row.category}`} className="data-table-row cols-sub">
-                <div className="data-col">{row.name}</div>
-                <div className="data-col data-col-muted">{row.category}</div>
-                <div className="data-col data-col-actions">
-                  <RowActions />
-                </div>
-              </div>
-            ))}
-          </div>
-          <Pagination />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ItemsPanel() {
-  const { setQuery, filtered } = useSearchFilter(
-    ITEMS_DATA,
-    (row) => `${row.name} ${row.displayName} ${row.category} ${row.shortCode}`,
-  );
-
-  return (
-    <section className="data-panel">
-      <div className="data-panel-toolbar">
-        <h2 className="data-panel-title">Items</h2>
-        <div className="toolbar-actions">
-          <button type="button" className="btn-new">
-            New
-          </button>
-          <button type="button" className="btn-export">
-            Export{' '}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div className="data-panel-card">
-        <SearchBox onSearch={setQuery} />
-        <div className="data-table data-table-scroll">
-          <div className="data-table-head cols-items">
-            <div className="data-col">
-              Name <SortIcon />
-            </div>
-            <div className="data-col">
-              Online Display Name <SortIcon />
-            </div>
-            <div className="data-col">
-              Category <SortIcon />
-            </div>
-            <div className="data-col">
-              Short Code <SortIcon />
-            </div>
-            <div className="data-col data-col-center">
-              Base Price <SortIcon />
-            </div>
-            <div className="data-col data-col-center">
-              Tax <SortIcon />
-            </div>
-            <div className="data-col data-col-center">
-              MRP <SortIcon />
-            </div>
-            <div className="data-col data-col-action">Action</div>
-          </div>
-          <div className="data-table-body">
-            {filtered.map((row) => (
-              <div key={row.name} className="data-table-row cols-items">
-                <div className="data-col">{row.name}</div>
-                <div className="data-col">{row.displayName}</div>
-                <div className="data-col data-col-muted">{row.category}</div>
-                <div className="data-col data-col-muted">{row.shortCode}</div>
-                <div className="data-col data-col-center">{row.basePrice}</div>
-                <div className="data-col data-col-center">{row.tax}</div>
-                <div className="data-col data-col-center">{row.mrp}</div>
-                <div className="data-col data-col-actions">
-                  <RowActions showClone />
-                </div>
-              </div>
-            ))}
-          </div>
-          <Pagination />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function AddonsPanel() {
-  return (
-    <section className="data-panel">
-      <div className="data-panel-toolbar">
-        <h2 className="data-panel-title">Addons</h2>
-        <div className="toolbar-actions">
-          <button type="button" className="btn-export">
-            Export{' '}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </button>
-          <button type="button" className="btn-new">
-            New
-          </button>
-        </div>
-      </div>
-      <div className="data-panel-card">
-        <div className="data-table">
-          <div className="data-table-head cols-addons">
-            <div className="data-col">
-              Name <SortIcon />
-            </div>
-            <div className="data-col">
-              Display Name <SortIcon />
-            </div>
-            <div className="data-col">
-              Items <SortIcon />
-            </div>
-            <div className="data-col data-col-action">Action</div>
-          </div>
-          <div className="data-table-body">
-            {ADDONS_DATA.map((row) => (
-              <div key={row.name} className="data-table-row cols-addons">
-                <div className="data-col">{row.name}</div>
-                <div className="data-col">{row.displayName}</div>
-                <div className="data-col data-col-muted">
-                  {row.readMore ? (
-                    <>
-                      {row.items.split(', ').slice(0, 2).join(', ')}...{' '}
-                      <a href="#" className="read-more-link">
-                        Read more
-                      </a>
-                    </>
-                  ) : (
-                    row.items
-                  )}
-                </div>
-                <div className="data-col data-col-actions">
-                  <RowActions />
-                </div>
-              </div>
-            ))}
-          </div>
-          <Pagination />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function VariantsPanel() {
-  const { setQuery, filtered } = useSearchFilter(VARIANTS_DATA, (name) => name);
-
-  return (
-    <section className="data-panel">
-      <div className="data-panel-toolbar">
-        <h2 className="data-panel-title">Variants</h2>
-        <button type="button" className="btn-new">
-          New
-        </button>
-      </div>
-      <div className="data-panel-card">
-        <SearchBox onSearch={setQuery} />
-        <div className="data-table">
-          <div className="data-table-head cols-variants">
-            <div className="data-col">
-              Name <SortIcon />
-            </div>
-            <div className="data-col data-col-action">Action</div>
-          </div>
-          <div className="data-table-body">
-            {filtered.map((name) => (
-              <div key={name} className="data-table-row cols-variants">
-                <div className="data-col">{name}</div>
-                <div className="data-col data-col-actions">
-                  <RowActions />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SubmenuPanel() {
-  return (
-    <section className="data-panel">
-      <div className="data-panel-toolbar">
-        <h2 className="data-panel-title">Submenu</h2>
-        <button type="button" className="btn-new">
-          New
-        </button>
-      </div>
-      <div className="data-panel-card">
-        <div className="search-toolbar">
-          <SearchBox />
-          <label className="inactive-toggle">
-            <input type="checkbox" /> Show Inactive Submenu
-          </label>
-        </div>
-        <div className="data-table">
-          <LoadingState />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const PANELS: Record<string, () => React.ReactNode> = {
-  'super-categories': SuperCategoriesPanel,
-  categories: CategoriesPanel,
-  'sub-categories': SubCategoriesPanel,
-  items: ItemsPanel,
-  addons: AddonsPanel,
-  variants: VariantsPanel,
-  submenu: SubmenuPanel,
+const CONFIGS: Record<string, PanelConfig> = {
+  'super-categories': {
+    title: 'Super Categories',
+    resource: 'super-categories',
+    colsClass: 'cols-super',
+    columns: [
+      { header: 'Name', key: 'name' },
+      { header: 'DisplayOrder', key: 'displayOrder', sortable: false },
+    ],
+    formFields: [
+      { key: 'name', label: 'Name', required: true },
+      { key: 'displayOrder', label: 'Display Order', type: 'number' },
+    ],
+  },
+  categories: {
+    title: 'Categories',
+    resource: 'categories',
+    colsClass: 'cols-categories',
+    columns: [
+      { header: 'Name', key: 'name' },
+      { header: 'Online Display Name', key: 'onlineDisplayName', muted: true },
+      { header: 'No. Of Items', key: 'itemCount', center: true },
+    ],
+    formFields: [
+      { key: 'name', label: 'Name', required: true },
+      { key: 'onlineDisplayName', label: 'Online Display Name' },
+      { key: 'itemCount', label: 'No. Of Items', type: 'number' },
+    ],
+  },
+  'sub-categories': {
+    title: 'Sub-Categories',
+    resource: 'sub-categories',
+    colsClass: 'cols-sub',
+    pageSize: 20,
+    columns: [
+      { header: 'Name', key: 'name' },
+      { header: 'Category', key: 'category', muted: true },
+    ],
+    formFields: [
+      { key: 'name', label: 'Name', required: true },
+      { key: 'category', label: 'Category' },
+    ],
+  },
+  items: {
+    title: 'Items',
+    resource: 'items',
+    colsClass: 'cols-items',
+    scroll: true,
+    showExport: true,
+    showClone: true,
+    pageSize: 20,
+    columns: [
+      { header: 'Name', key: 'name' },
+      { header: 'Online Display Name', key: 'displayName' },
+      { header: 'Category', key: 'category', muted: true },
+      { header: 'Short Code', key: 'shortCode', muted: true },
+      { header: 'Base Price', key: 'basePrice', center: true },
+      { header: 'Tax', key: 'tax', center: true },
+      { header: 'MRP', key: 'mrp', center: true },
+    ],
+    formFields: [
+      { key: 'name', label: 'Name', required: true },
+      { key: 'displayName', label: 'Online Display Name' },
+      { key: 'category', label: 'Category' },
+      { key: 'shortCode', label: 'Short Code' },
+      { key: 'basePrice', label: 'Base Price', type: 'number' },
+      { key: 'tax', label: 'Tax' },
+      { key: 'mrp', label: 'MRP', type: 'number' },
+    ],
+  },
+  addons: {
+    title: 'Addons',
+    resource: 'addons',
+    colsClass: 'cols-addons',
+    searchable: false,
+    showExport: true,
+    exportFirst: true,
+    pageSize: 20,
+    columns: [
+      { header: 'Name', key: 'name' },
+      { header: 'Display Name', key: 'displayName' },
+      {
+        header: 'Items',
+        key: 'items',
+        muted: true,
+        sortable: false,
+        render: (row: Row) => {
+          const items = String(row.items ?? '');
+          const parts = items.split(', ');
+          if (parts.length > 2) {
+            return <span>{parts.slice(0, 2).join(', ')}…</span>;
+          }
+          return <span>{items}</span>;
+        },
+      },
+    ],
+    formFields: [
+      { key: 'name', label: 'Name', required: true },
+      { key: 'displayName', label: 'Display Name' },
+      { key: 'items', label: 'Items (comma separated)' },
+    ],
+  },
+  variants: {
+    title: 'Variants',
+    resource: 'variants',
+    colsClass: 'cols-variants',
+    columns: [{ header: 'Name', key: 'name' }],
+    formFields: [{ key: 'name', label: 'Name', required: true }],
+  },
+  submenu: {
+    title: 'Submenu',
+    resource: 'submenu',
+    colsClass: 'cols-submenu',
+    columns: [
+      { header: 'Name', key: 'name' },
+      {
+        header: 'Status',
+        key: 'isActive',
+        center: true,
+        sortable: false,
+        render: (row: Row) => (
+          <span className={row.isActive ? 'status-pill status-active' : 'status-pill status-inactive'}>
+            {row.isActive ? 'Active' : 'Inactive'}
+          </span>
+        ),
+      },
+    ],
+    formFields: [
+      { key: 'name', label: 'Name', required: true },
+      { key: 'isActive', label: 'Active (1 = yes, 0 = no)', type: 'number' },
+    ],
+  },
 };
 
 export default function MenuMasterContent({ slug }: { slug: string }) {
-  const Panel = PANELS[slug];
-  if (!Panel) return null;
-  return <Panel />;
+  const config = CONFIGS[slug];
+  if (!config) return null;
+  return <ResourcePanel config={config} />;
 }

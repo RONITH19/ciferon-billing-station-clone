@@ -20,13 +20,13 @@ const navItems = [
       <path d="M9 21V12h6v9" />
     </svg>
   )},
-  { id: 'inventory', href: '#', label: 'Inventory', icon: (
+  { id: 'inventory', href: '/inventory', label: 'Inventory', icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="3" y="8" width="14" height="14" rx="1" />
       <rect x="7" y="4" width="14" height="14" rx="1" />
     </svg>
   )},
-  { id: 'crm', href: '#', label: 'CRM', icon: (
+  { id: 'crm', href: '/crm', label: 'CRM', icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M6 4h12a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" />
       <circle cx="17" cy="7" r="2.5" />
@@ -34,26 +34,26 @@ const navItems = [
       <line x1="8" y1="14" x2="12" y2="14" />
     </svg>
   )},
-  { id: 'reports', href: '#', label: 'Reports', icon: (
+  { id: 'reports', href: '/reports', label: 'Reports', icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <line x1="18" y1="20" x2="18" y2="10" />
       <line x1="12" y1="20" x2="12" y2="4" />
       <line x1="6" y1="20" x2="6" y2="14" />
     </svg>
   )},
-  { id: 'locations', href: '#', label: 'Locations', icon: (
+  { id: 'locations', href: '/locations', label: 'Locations', icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
       <circle cx="12" cy="10" r="3" />
     </svg>
   )},
-  { id: 'users', href: '#', label: 'Users', icon: (
+  { id: 'users', href: '/users', label: 'Users', icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
     </svg>
   )},
-  { id: 'settings', href: '#', label: 'Settings', icon: (
+  { id: 'settings', href: '/settings', label: 'Settings', icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
@@ -79,7 +79,21 @@ export default function Sidebar() {
     localStorage.setItem(SIDEBAR_KEY, 'true');
   };
 
-  const activeNav = isMenuSection ? 'menu' : 'outlet';
+  const activeNav = isMenuSection
+    ? 'menu'
+    : pathname.startsWith('/inventory')
+      ? 'inventory'
+      : pathname.startsWith('/crm')
+        ? 'crm'
+        : pathname.startsWith('/reports')
+          ? 'reports'
+          : pathname.startsWith('/locations')
+            ? 'locations'
+            : pathname.startsWith('/users')
+              ? 'users'
+              : pathname.startsWith('/settings')
+                ? 'settings'
+                : 'outlet';
 
   return (
     <aside className={`sidebar${collapsed ? ' collapsed' : ''}`} id="sidebar">

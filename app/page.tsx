@@ -3,36 +3,45 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect } from 'react';
-import { isLoggedIn, setLoggedIn } from '@/lib/auth';
+import { FormEvent, useEffect, useState } from 'react';
+import { checkAuth } from '@/lib/auth';
+import { apiLogin } from '@/lib/api-client';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (isLoggedIn()) {
-      router.replace('/outlets');
-    }
+    checkAuth().then((ok) => {
+      if (ok) router.replace('/outlets');
+    });
   }, [router]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError('');
     const form = event.currentTarget;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
 
     if (!email || !password) {
-      alert('Please enter both email and password.');
+      setError('Please enter both email and password.');
       return;
     }
-
     if (!email.includes('@')) {
-      alert('Please enter a valid email address.');
+      setError('Please enter a valid email address.');
       return;
     }
 
-    setLoggedIn();
-    router.push('/outlets');
+    setBusy(true);
+    try {
+      await apiLogin(email, password);
+      router.push('/outlets');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed.');
+      setBusy(false);
+    }
   };
 
   return (
@@ -45,8 +54,9 @@ export default function LoginPage() {
           <form className="login-form" onSubmit={handleSubmit}>
             <input type="email" name="email" placeholder="Email" className="form-input" autoComplete="email" required />
             <input type="password" name="password" placeholder="Password" className="form-input" autoComplete="current-password" required />
-            <button type="submit" className="btn-primary">
-              Login into shobox
+            {error && <p className="form-error">{error}</p>}
+            <button type="submit" className="btn-primary" disabled={busy}>
+              {busy ? 'Signing in…' : 'Login into shobox'}
             </button>
           </form>
 

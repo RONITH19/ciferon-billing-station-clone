@@ -4,40 +4,46 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
-import { setLoggedIn } from '@/lib/auth';
+import { apiSendOtp, apiVerifyOtp } from '@/lib/api-client';
 
 export default function OtpPage() {
   const router = useRouter();
   const [otpSent, setOtpSent] = useState(false);
+  const [error, setError] = useState('');
+  const [devCode, setDevCode] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError('');
     const form = event.currentTarget;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const otp = (form.elements.namedItem('otp') as HTMLInputElement | null)?.value.trim();
 
-    if (!email) {
-      alert('Please enter your email address.');
+    if (!email || !email.includes('@')) {
+      setError('Please enter a valid email address.');
       return;
     }
 
-    if (!email.includes('@')) {
-      alert('Please enter a valid email address.');
-      return;
+    setBusy(true);
+    try {
+      if (!otpSent) {
+        const res = await apiSendOtp(email);
+        setOtpSent(true);
+        setDevCode(res.devCode);
+        return;
+      }
+      if (!otp) {
+        setError('Please enter the OTP.');
+        return;
+      }
+      await apiVerifyOtp(email, otp);
+      router.push('/outlets');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
+    } finally {
+      setBusy(false);
     }
-
-    if (!otpSent) {
-      setOtpSent(true);
-      return;
-    }
-
-    if (!otp) {
-      alert('Please enter the OTP sent to your email.');
-      return;
-    }
-
-    setLoggedIn();
-    router.push('/outlets');
   };
 
   return (
@@ -52,8 +58,14 @@ export default function OtpPage() {
             <div className="otp-field" hidden={!otpSent}>
               <input type="text" name="otp" placeholder="Enter OTP" className="form-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
             </div>
-            <button type="submit" className="btn-primary">
-              {otpSent ? 'Verify OTP' : 'Send OTP'}
+            {devCode && (
+              <p className="form-hint">
+                Demo OTP (no email server): <strong>{devCode}</strong>
+              </p>
+            )}
+            {error && <p className="form-error">{error}</p>}
+            <button type="submit" className="btn-primary" disabled={busy}>
+              {busy ? 'Please wait…' : otpSent ? 'Verify OTP' : 'Send OTP'}
             </button>
           </form>
 
