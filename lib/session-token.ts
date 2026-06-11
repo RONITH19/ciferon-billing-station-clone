@@ -1,16 +1,13 @@
-// Pure, runtime-agnostic session token helpers (safe for the Edge middleware).
-// The token is just the URL-encoded email — adequate for a local demo app.
-export const SESSION_COOKIE = 'shobox_session';
-export const SESSION_MAX_AGE = 60 * 60 * 8; // 8 hours
-
-export function encodeSession(email: string): string {
-  return encodeURIComponent(email);
-}
+// Edge-safe session helpers (middleware). Signature verification runs on the server in session.server.ts.
+export const SESSION_COOKIE = 'sobos_session';
+export const SESSION_MAX_AGE = 60 * 60 * 8;
 
 export function decodeSession(value: string | undefined): string | null {
   if (!value) return null;
+  const dot = value.lastIndexOf('.');
+  const payload = dot >= 0 ? value.slice(0, dot) : value;
   try {
-    const email = decodeURIComponent(value);
+    const email = decodeURIComponent(payload);
     return email.includes('@') ? email : null;
   } catch {
     return null;

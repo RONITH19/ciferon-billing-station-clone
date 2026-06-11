@@ -1,22 +1,33 @@
 'use client';
 
+import { FormEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { checkAuth } from '@/lib/auth';
 import { apiLogin } from '@/lib/api-client';
+import { DEMO_LOGIN_USERS, DEMO_PASSWORD } from '@/lib/demo-users.constants';
 
-export default function LoginPage() {
-  const router = useRouter();
+// Dynamically import the React SPA with SSR disabled
+const ReactApp = dynamic(() => import('@/src/App').then((mod) => mod.App), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-screen items-center justify-center bg-gray-50 text-gray-500 font-sans">
+      Loading sobos Billing Station...
+    </div>
+  ),
+});
+
+export default function RootPage() {
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     checkAuth().then((ok) => {
-      if (ok) router.replace('/outlets');
+      setAuthenticated(ok);
     });
-  }, [router]);
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,28 +48,69 @@ export default function LoginPage() {
     setBusy(true);
     try {
       await apiLogin(email, password);
-      router.push('/outlets');
+      setAuthenticated(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed.');
       setBusy(false);
     }
   };
 
+  if (authenticated === null) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50 text-gray-500 font-sans">
+        Checking session...
+      </div>
+    );
+  }
+
+  if (authenticated) {
+    return <ReactApp />;
+  }
+
   return (
     <main className="page">
       <div className="card">
         <section className="login-panel">
           <h1 className="login-title">Sign in</h1>
-          <p className="login-subtitle">to access shobox Billing Station</p>
+          <p className="login-subtitle">to access sobos Billing Station</p>
 
           <form className="login-form" onSubmit={handleSubmit}>
-            <input type="email" name="email" placeholder="Email" className="form-input" autoComplete="email" required />
-            <input type="password" name="password" placeholder="Password" className="form-input" autoComplete="current-password" required />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              className="form-input"
+              autoComplete="email"
+              defaultValue={DEMO_LOGIN_USERS[0]?.email ?? ''}
+              required
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="form-input"
+              autoComplete="current-password"
+              defaultValue={DEMO_PASSWORD}
+              required
+            />
             {error && <p className="form-error">{error}</p>}
             <button type="submit" className="btn-primary" disabled={busy}>
-              {busy ? 'Signing in…' : 'Login into shobox'}
+              {busy ? 'Signing in…' : 'Login into sobos'}
             </button>
           </form>
+
+          <div className="mt-4 rounded-md border border-[#e5e7eb] bg-[#f8fafc] p-3 text-left text-xs text-[#6b7280]">
+            <p className="mb-2 font-semibold text-[#111827]">Demo accounts (password: {DEMO_PASSWORD})</p>
+            <ul className="space-y-1">
+              {DEMO_LOGIN_USERS.map((u) => (
+                <li key={u.email}>
+                  <span className="font-medium text-[#111827]">{u.role}</span>
+                  {' — '}
+                  {u.email}
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <Link href="/otp" className="otp-link">
             Login with OTP

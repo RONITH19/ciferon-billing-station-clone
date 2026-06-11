@@ -1,19 +1,12 @@
-import { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { updateResource, deleteResource } from '@/lib/crud';
-
-function parseId(raw: string): number | null {
-  const n = Number(raw);
-  return Number.isInteger(n) && n > 0 ? n : null;
-}
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ resource: string; id: string }> },
 ) {
   const { resource, id } = await params;
-  const numId = parseId(id);
-  if (numId === null) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
+  if (!id) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
   let body: Record<string, unknown>;
   try {
@@ -21,7 +14,9 @@ export async function PUT(
   } catch {
     body = {};
   }
-  return updateResource(resource, numId, body);
+  
+  const parsedId = /^\d+$/.test(id) ? Number(id) : id;
+  return updateResource(resource, parsedId, body);
 }
 
 export async function DELETE(
@@ -29,7 +24,8 @@ export async function DELETE(
   { params }: { params: Promise<{ resource: string; id: string }> },
 ) {
   const { resource, id } = await params;
-  const numId = parseId(id);
-  if (numId === null) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
-  return deleteResource(resource, numId);
+  if (!id) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
+
+  const parsedId = /^\d+$/.test(id) ? Number(id) : id;
+  return deleteResource(resource, parsedId);
 }

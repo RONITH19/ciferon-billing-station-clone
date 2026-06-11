@@ -1,8 +1,8 @@
-# shobox Billing Station
+# sobos Billing Station
 
 Next.js 15 (App Router) admin UI, now backed by a local **SQLite** database via
 API route handlers. No external services — the database is a single file at
-`data/shobox.db`, created and seeded automatically on first run.
+`data/sobos.db`, created and seeded automatically on first run.
 
 ## Run it
 
@@ -11,7 +11,7 @@ npm install      # installs better-sqlite3 (prebuilt binary on most platforms)
 npm run dev      # http://localhost:3000
 ```
 
-The first request creates `data/shobox.db` and seeds it with the original menu
+The first request creates `data/sobos.db` and seeds it with the original menu
 data (categories, items, addons, variants, etc.). Delete that file to reset.
 
 ## Auth (demo)

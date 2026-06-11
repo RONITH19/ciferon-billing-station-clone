@@ -1,11 +1,12 @@
 import { cookies } from 'next/headers';
-import { SESSION_COOKIE, SESSION_MAX_AGE, encodeSession, decodeSession } from './session-token';
+import { SESSION_COOKIE, SESSION_MAX_AGE, decodeSession } from './session-token';
+import { encodeSessionSigned, verifySessionSigned } from './session.server';
 
 export { SESSION_COOKIE, decodeSession } from './session-token';
 
 export async function setSession(email: string) {
   const store = await cookies();
-  store.set(SESSION_COOKIE, encodeSession(email), {
+  store.set(SESSION_COOKIE, encodeSessionSigned(email), {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
@@ -20,5 +21,7 @@ export async function clearSession() {
 
 export async function getSessionEmail(): Promise<string | null> {
   const store = await cookies();
-  return decodeSession(store.get(SESSION_COOKIE)?.value);
+  const value = store.get(SESSION_COOKIE)?.value;
+  if (!value) return null;
+  return verifySessionSigned(value) ?? decodeSession(value);
 }

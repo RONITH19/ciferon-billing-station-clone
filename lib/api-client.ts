@@ -113,7 +113,10 @@ export interface ReportSummary {
     total: number;
     itemCount: number;
     status: string;
+    tableLabel?: string;
   }[];
+  kitchenStatus?: { status: string; count: number }[];
+  activeTables?: number;
 }
 
 export async function apiReportSummary(): Promise<ReportSummary> {
@@ -136,4 +139,110 @@ export async function apiSaveSettings(
     body: JSON.stringify(values),
   });
   return (await handle<{ data: Record<string, string> }>(res)).data;
+}
+
+// --- Operations ---
+
+export interface MenuItem {
+  id: number;
+  name: string;
+  displayName: string;
+  category: string;
+  basePrice: number;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export async function apiCreateOrder(body: Record<string, unknown>) {
+  const res = await fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return (await handle<{ data: unknown }>(res)).data;
+}
+
+export async function apiListOrders(params?: { status?: string; q?: string }) {
+  const sp = new URLSearchParams();
+  if (params?.status) sp.set('status', params.status);
+  if (params?.q) sp.set('q', params.q);
+  const q = sp.toString();
+  return handle<{ data: unknown[] }>(await fetch(`/api/orders${q ? `?${q}` : ''}`, { cache: 'no-store' }));
+}
+
+export async function apiGetOrder(id: number) {
+  return handle<{ data: { order: unknown; items: unknown[]; timeline: unknown[] } }>(
+    await fetch(`/api/orders/${id}`, { cache: 'no-store' }),
+  );
+}
+
+export async function apiUpdateOrderStatus(id: number, status: string) {
+  const res = await fetch(`/api/orders/${id}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  return (await handle<{ data: unknown }>(res)).data;
+}
+
+export async function apiListTables(outletId: number) {
+  return handle<{ data: unknown[] }>(
+    await fetch(`/api/tables?outletId=${outletId}`, { cache: 'no-store' }),
+  );
+}
+
+export async function apiOpenTableSession(tableId: number, outletId: number, guestCount = 2) {
+  const res = await fetch(`/api/tables/${tableId}/sessions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ outletId, guestCount }),
+  });
+  return (await handle<{ data: { sessionId: number } }>(res)).data;
+}
+
+export async function apiCloseSession(sessionId: number) {
+  await handle(
+    await fetch(`/api/sessions/${sessionId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'close' }),
+    }),
+  );
+}
+
+export async function apiKdsFeed(station = 'Kitchen') {
+  return handle<{ data: unknown[] }>(
+    await fetch(`/api/kds/feed?station=${encodeURIComponent(station)}`, { cache: 'no-store' }),
+  );
+}
+
+export async function apiKdsBump(orderId: number, target: 'Preparing' | 'Ready' = 'Ready') {
+  const res = await fetch('/api/kds/bump', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId, target }),
+  });
+  return (await handle<{ data: unknown }>(res)).data;
+}
+
+export async function apiListHeldOrders(outletId: number) {
+  return handle<{ data: unknown[] }>(
+    await fetch(`/api/held-orders?outletId=${outletId}`, { cache: 'no-store' }),
+  );
+}
+
+export async function apiSaveHeldOrder(outletId: number, label: string, cartJson: string) {
+  const res = await fetch('/api/held-orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ outletId, label, cartJson }),
+  });
+  return (await handle<{ data: { id: number } }>(res)).data;
+}
+
+export async function apiDeleteHeldOrder(id: number) {
+  await fetch(`/api/held-orders?id=${id}`, { method: 'DELETE' });
 }

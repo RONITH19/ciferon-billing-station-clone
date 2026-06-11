@@ -63,7 +63,7 @@ export async function createResource(resource: string, body: Record<string, unkn
 
 export async function updateResource(
   resource: string,
-  id: number,
+  id: number | string,
   body: Record<string, unknown>,
 ) {
   const auth = await requireAuth();
@@ -94,7 +94,7 @@ export async function updateResource(
   return NextResponse.json({ data: rowToApi(def, row) });
 }
 
-export async function deleteResource(resource: string, id: number) {
+export async function deleteResource(resource: string, id: number | string) {
   const auth = await requireAuth();
   if (auth) return auth;
   const def = resolve(resource);
@@ -106,7 +106,7 @@ export async function deleteResource(resource: string, id: number) {
   return NextResponse.json({ ok: true });
 }
 
-export async function cloneResource(resource: string, id: number) {
+export async function cloneResource(resource: string, id: number | string) {
   const auth = await requireAuth();
   if (auth) return auth;
   const def = resolve(resource);

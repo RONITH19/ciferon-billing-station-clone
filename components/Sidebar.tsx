@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
-const SIDEBAR_KEY = 'shobox_sidebar_collapsed';
+const SIDEBAR_KEY = 'sobos_sidebar_collapsed';
 
 const navItems = [
   { id: 'outlet', href: '/outlets', label: 'Go to Outlet', icon: (
@@ -100,7 +100,7 @@ export default function Sidebar() {
       <div className="sidebar-header">
         <Link href="/outlets" className="sidebar-brand">
           <Image className="sidebar-brand-icon" src="/assets/favicon.svg" alt="" width={28} height={28} />
-          <span className="sidebar-brand-text">shobox</span>
+          <span className="sidebar-brand-text">sobos</span>
         </Link>
         <button type="button" className="sidebar-toggle" onClick={collapseSidebar} aria-label="Collapse sidebar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">

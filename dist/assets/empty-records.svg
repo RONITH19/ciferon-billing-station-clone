@@ -1,0 +1,18 @@
+<svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <rect x="120" y="20" width="28" height="36" rx="2" fill="#e8edf2" stroke="#c5d0db" stroke-width="1"/>
+  <rect x="145" y="35" width="22" height="28" rx="2" fill="#f0f4f8" stroke="#d0dae3" stroke-width="1"/>
+  <rect x="30" y="45" width="24" height="32" rx="2" fill="#eef3f7" stroke="#d0dae3" stroke-width="1"/>
+
+  <path d="M55 120 L55 85 Q55 70 70 70 L130 70 Q145 70 145 85 L145 120 Z" fill="#4a8fd4"/>
+  <path d="M55 85 L55 78 Q55 68 65 68 L85 68 L90 78 L145 78 L145 85 Z" fill="#3a7fc4"/>
+
+  <text x="92" y="102" fill="#ffffff" font-family="Arial,sans-serif" font-size="22" font-weight="700">X</text>
+
+  <circle cx="108" cy="42" r="10" fill="#f5d0b5"/>
+  <path d="M98 55 Q108 48 118 55 L118 75 L98 75 Z" fill="#ffffff" stroke="#d0dae3" stroke-width="1"/>
+  <path d="M100 75 L100 110 L116 110 L116 75" fill="#4a5568"/>
+  <path d="M96 110 L120 110 L118 118 L98 118 Z" fill="#2d3748"/>
+
+  <path d="M118 78 Q135 85 140 95" stroke="#f5d0b5" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M88 78 Q72 88 65 98" stroke="#f5d0b5" stroke-width="6" stroke-linecap="round" fill="none"/>
+</svg>

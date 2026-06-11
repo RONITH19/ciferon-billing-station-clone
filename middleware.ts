@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SESSION_COOKIE, decodeSession } from '@/lib/session-token';
 
-// Protect dashboard pages: redirect unauthenticated users to the login page.
-const PROTECTED = [
+const PROTECTED_PREFIXES = [
+  '/dashboard',
+  '/billing',
+  '/orders',
+  '/kds',
+  '/tables',
   '/outlets',
   '/menu',
   '/inventory',
@@ -15,7 +19,9 @@ const PROTECTED = [
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const needsAuth = PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const needsAuth = PROTECTED_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
   if (!needsAuth) return NextResponse.next();
 
   const email = decodeSession(request.cookies.get(SESSION_COOKIE)?.value);
@@ -24,11 +30,21 @@ export function middleware(request: NextRequest) {
     url.pathname = '/';
     return NextResponse.redirect(url);
   }
-  return NextResponse.next();
+
+  // Redirect page requests to the SPA HashRouter equivalent.
+  const url = request.nextUrl.clone();
+  url.pathname = '/';
+  url.hash = pathname;
+  return NextResponse.redirect(url);
 }
 
 export const config = {
   matcher: [
+    '/dashboard/:path*',
+    '/billing/:path*',
+    '/orders/:path*',
+    '/kds/:path*',
+    '/tables/:path*',
     '/outlets/:path*',
     '/menu/:path*',
     '/inventory/:path*',

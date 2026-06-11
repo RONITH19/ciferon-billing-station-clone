@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import '@/app/globals.css';
 import '@/styles/login.css';
 import '@/styles/dashboard.css';
+import { QueryProvider } from '@/components/providers/query-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -9,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'shobox Billing Station',
-  description: 'shobox Billing Station admin UI clone',
+  title: 'RestaurantOS — Billing Station',
+  description: 'Premium restaurant operating system',
   icons: {
     icon: '/assets/favicon.svg',
   },
@@ -19,7 +21,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }

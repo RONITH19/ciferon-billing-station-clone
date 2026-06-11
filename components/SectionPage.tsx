@@ -1,28 +1,26 @@
 'use client';
 
-import AuthGuard from '@/components/AuthGuard';
-import DashboardShell from '@/components/DashboardShell';
+import { AppShell } from '@/components/layout/app-shell';
 import ResourcePanel, { type PanelConfig } from '@/components/menu/ResourcePanel';
 
-// Shared layout for the simple CRUD sections (inventory, CRM, locations, users).
 export default function SectionPage({
   title,
   pageKey,
   config,
+  breadcrumb,
 }: {
   title: string;
   pageKey: string;
   config: PanelConfig;
+  breadcrumb?: string[];
 }) {
   return (
-    <AuthGuard>
-      <div className="dashboard-body" data-page={pageKey}>
-        <DashboardShell title={title}>
-          <main className="dashboard-content section-content">
-            <ResourcePanel config={config} />
-          </main>
-        </DashboardShell>
+    <AppShell title={title} breadcrumb={breadcrumb}>
+      <div className="legacy-dashboard dashboard-body" data-page={pageKey}>
+        <div className="section-content rounded-xl border bg-card p-4">
+          <ResourcePanel config={config} />
+        </div>
       </div>
-    </AuthGuard>
+    </AppShell>
   );
 }
