@@ -121,66 +121,14 @@ export const BookletsPage: React.FC = () => {
             <ArrowLeft className="w-4 h-4" />
             Back
           </Link>
-          <button
-            onClick={() => setIsFormOpen(true)}
+          <Link
+            to="/offers/bookletlist/new"
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-blue-100 transition-all"
           >
             <Plus className="w-4 h-4" />
             New
-          </button>
+          </Link>
         </PageHeader>
-
-        {isFormOpen && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <form
-              onSubmit={handleSave}
-              className="bg-white rounded-2xl border border-gray-100 shadow-xl max-w-md w-full overflow-hidden p-6 animate-scale-up"
-            >
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
-                <h3 className="text-lg font-bold text-gray-900">New Booklet</h3>
-                <button
-                  type="button"
-                  onClick={() => setIsFormOpen(false)}
-                  className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="mb-5">
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">
-                  Booklet Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={bookletName}
-                  onChange={(e) => setBookletName(e.target.value)}
-                  placeholder="e.g. Bronze Members Booklet"
-                  className="w-full px-4 py-2.5 border border-gray-250 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
-                  autoFocus
-                  required
-                />
-              </div>
-
-              <div className="flex items-center gap-3 justify-end">
-                <button
-                  type="button"
-                  onClick={() => setIsFormOpen(false)}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md shadow-blue-100 transition-all"
-                >
-                  <Check className="w-4 h-4" />
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
 
         <DataTable
           columns={columns}

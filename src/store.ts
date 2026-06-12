@@ -47,6 +47,44 @@ export interface Department {
 export interface Booklet {
   id: string;
   name: string;
+  redemptionInterval?: number;
+  isActive?: boolean;
+  offers?: string;
+  amount?: number;
+}
+
+export interface Campaign {
+  id: string;
+  campaignCategory: 'offer' | 'loyalty_plan' | 'redemption';
+  name: string;
+  description: string;
+  promocode: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  startingFrom?: string;
+  endingAt?: string;
+  applicableDays?: string;
+  redeemLimit?: number;
+  customerLimit?: number;
+  resetFrequency?: string;
+  resetLimit?: number;
+  conditions?: string;
+  categoryLimit?: string;
+  itemLimit?: string;
+}
+
+export interface OfferQR {
+  id: string;
+  name: string;
+  type: 'With Offer' | 'Without Offer';
+  offer: string;
+  thankYouMessage: string;
+  homeScreenMessage: string;
+  isActive: boolean;
+  printPos: boolean;
+  printOnline: boolean;
 }
 
 export interface LoyaltySetting {
@@ -109,6 +147,7 @@ export interface AccountingCustomer {
   totalSpend: number;
   totalOrders: number;
   balance: number;
+  visits: number;
 }
 
 export interface CreditSale {
@@ -240,8 +279,19 @@ interface AppState {
   deleteDepartment: (id: string) => Promise<void>;
 
   booklets: Booklet[];
-  addBooklet: (booklet: Booklet) => Promise<void>;
+  addBooklet: (booklet: Omit<Booklet, 'id'>) => Promise<void>;
+  updateBooklet: (id: string, booklet: Partial<Booklet>) => Promise<void>;
   deleteBooklet: (id: string) => Promise<void>;
+
+  campaigns: Campaign[];
+  addCampaign: (campaign: Omit<Campaign, 'id'>) => Promise<void>;
+  updateCampaign: (id: string, campaign: Partial<Campaign>) => Promise<void>;
+  deleteCampaign: (id: string) => Promise<void>;
+
+  offerQRs: OfferQR[];
+  addOfferQR: (qr: Omit<OfferQR, 'id'>) => Promise<void>;
+  updateOfferQR: (id: string, qr: Partial<OfferQR>) => Promise<void>;
+  deleteOfferQR: (id: string) => Promise<void>;
 
   // Accounting Customers
   accountingCustomers: AccountingCustomer[];
@@ -353,6 +403,8 @@ export const useStore = create<AppState>((set) => ({
         purchaseOrders,
         purchaseInvoices,
         settings,
+        campaignsData,
+        offerQRsData,
       ] = await Promise.all([
         apiList<any>('charges'),
         apiList<any>('kitchens'),
@@ -370,6 +422,8 @@ export const useStore = create<AppState>((set) => ({
         apiList<any>('purchase-orders'),
         apiList<any>('purchase-invoices'),
         apiGetSettings(),
+        apiList<any>('campaigns'),
+        apiList<any>('offer-qrs'),
       ]);
 
       // Parse kitchens menuItemsJson
@@ -458,7 +512,46 @@ export const useStore = create<AppState>((set) => ({
         kitchens,
         producedStocks: producedStocks.map((s: any) => ({ id: String(s.id), date: s.date, status: s.status })),
         departments: departments.map((d: any) => ({ id: String(d.id), name: d.name })),
-        booklets: booklets.map((b: any) => ({ id: String(b.id), name: b.name })),
+        booklets: booklets.map((b: any) => ({
+          id: String(b.id),
+          name: b.name,
+          redemptionInterval: Number(b.redemptionInterval || 0),
+          isActive: !!b.isActive,
+          offers: b.offers || '',
+          amount: Number(b.amount || 0)
+        })),
+        campaigns: campaignsData.map((c: any) => ({
+          id: String(c.id),
+          campaignCategory: c.campaignCategory || 'offer',
+          name: c.name,
+          description: c.description || '',
+          promocode: c.promocode || '',
+          type: c.type || 'BOGO',
+          startDate: c.startDate,
+          endDate: c.endDate,
+          isActive: !!c.isActive,
+          startingFrom: c.startingFrom,
+          endingAt: c.endingAt,
+          applicableDays: c.applicableDays,
+          redeemLimit: c.redeemLimit ? Number(c.redeemLimit) : undefined,
+          customerLimit: c.customerLimit ? Number(c.customerLimit) : undefined,
+          resetFrequency: c.resetFrequency,
+          resetLimit: c.resetLimit ? Number(c.resetLimit) : undefined,
+          conditions: c.conditions || '',
+          categoryLimit: c.categoryLimit || '',
+          itemLimit: c.itemLimit || '',
+        })),
+        offerQRs: offerQRsData.map((q: any) => ({
+          id: String(q.id),
+          name: q.name,
+          type: q.type || 'With Offer',
+          offer: q.offer || '',
+          thankYouMessage: q.thankYouMessage || '',
+          homeScreenMessage: q.homeScreenMessage || '',
+          isActive: !!q.isActive,
+          printPos: !!q.printPos,
+          printOnline: !!q.printOnline,
+        })),
         accountingCustomers: accountingCustomers.map((c: any) => ({
           id: String(c.id),
           name: c.name,
@@ -468,6 +561,7 @@ export const useStore = create<AppState>((set) => ({
           totalSpend: Number(c.totalSpend || 0),
           totalOrders: Number(c.totalOrders || 0),
           balance: Number(c.balance || 0),
+          visits: Number(c.visits || 0),
         })),
         creditSales: creditSales.map((s: any) => ({
           id: String(s.id),
@@ -669,10 +763,40 @@ export const useStore = create<AppState>((set) => ({
   booklets: [],
   addBooklet: async (booklet) => {
     try {
-      const created = await apiCreate<any>('booklets', { name: booklet.name });
-      set((state) => ({ booklets: [...state.booklets, { id: String(created.id), name: created.name }] }));
+      const created = await apiCreate<any>('booklets', {
+        name: booklet.name,
+        redemptionInterval: booklet.redemptionInterval ?? 0,
+        isActive: booklet.isActive ? 1 : 0,
+        offers: booklet.offers ?? '',
+        amount: booklet.amount ?? 0,
+      });
+      set((state) => ({
+        booklets: [
+          ...state.booklets,
+          {
+            id: String(created.id),
+            name: created.name,
+            redemptionInterval: Number(created.redemptionInterval || 0),
+            isActive: !!created.isActive,
+            offers: created.offers || '',
+            amount: Number(created.amount || 0),
+          },
+        ],
+      }));
     } catch (err) {
       useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to add booklet', 'error');
+    }
+  },
+  updateBooklet: async (id, booklet) => {
+    try {
+      const body: any = { ...booklet };
+      if (booklet.isActive !== undefined) body.isActive = booklet.isActive ? 1 : 0;
+      await apiUpdate<any>('booklets', Number(id), body);
+      set((state) => ({
+        booklets: state.booklets.map((b) => (b.id === id ? { ...b, ...booklet } : b)),
+      }));
+    } catch (err) {
+      useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to update booklet', 'error');
     }
   },
   deleteBooklet: async (id) => {
@@ -681,6 +805,136 @@ export const useStore = create<AppState>((set) => ({
       set((state) => ({ booklets: state.booklets.filter((b) => b.id !== id) }));
     } catch (err) {
       useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to delete booklet', 'error');
+    }
+  },
+
+  campaigns: [],
+  addCampaign: async (campaign) => {
+    try {
+      const created = await apiCreate<any>('campaigns', {
+        campaignCategory: campaign.campaignCategory,
+        name: campaign.name,
+        description: campaign.description || '',
+        promocode: campaign.promocode || '',
+        type: campaign.type || 'BOGO',
+        startDate: campaign.startDate,
+        endDate: campaign.endDate,
+        isActive: campaign.isActive ? 1 : 0,
+        startingFrom: campaign.startingFrom || '12:00 AM',
+        endingAt: campaign.endingAt || '11:59 PM',
+        applicableDays: campaign.applicableDays || 'Sun,Mon,Tue,Wed,Thu,Fri,Sat',
+        redeemLimit: campaign.redeemLimit,
+        customerLimit: campaign.customerLimit,
+        resetFrequency: campaign.resetFrequency,
+        resetLimit: campaign.resetLimit,
+        conditions: campaign.conditions || '',
+        categoryLimit: campaign.categoryLimit || '',
+        itemLimit: campaign.itemLimit || '',
+      });
+      set((state) => ({
+        campaigns: [
+          ...state.campaigns,
+          {
+            id: String(created.id),
+            campaignCategory: created.campaignCategory || 'offer',
+            name: created.name,
+            description: created.description || '',
+            promocode: created.promocode || '',
+            type: created.type || 'BOGO',
+            startDate: created.startDate,
+            endDate: created.endDate,
+            isActive: !!created.isActive,
+            startingFrom: created.startingFrom,
+            endingAt: created.endingAt,
+            applicableDays: created.applicableDays,
+            redeemLimit: created.redeemLimit ? Number(created.redeemLimit) : undefined,
+            customerLimit: created.customerLimit ? Number(created.customerLimit) : undefined,
+            resetFrequency: created.resetFrequency,
+            resetLimit: created.resetLimit ? Number(created.resetLimit) : undefined,
+            conditions: created.conditions || '',
+            categoryLimit: created.categoryLimit || '',
+            itemLimit: created.itemLimit || '',
+          },
+        ],
+      }));
+    } catch (err) {
+      useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to add campaign', 'error');
+    }
+  },
+  updateCampaign: async (id, campaign) => {
+    try {
+      const body: any = { ...campaign };
+      if (campaign.isActive !== undefined) body.isActive = campaign.isActive ? 1 : 0;
+      await apiUpdate<any>('campaigns', Number(id), body);
+      set((state) => ({
+        campaigns: state.campaigns.map((c) => (c.id === id ? { ...c, ...campaign } : c)),
+      }));
+    } catch (err) {
+      useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to update campaign', 'error');
+    }
+  },
+  deleteCampaign: async (id) => {
+    try {
+      await apiDelete('campaigns', Number(id));
+      set((state) => ({ campaigns: state.campaigns.filter((c) => c.id !== id) }));
+    } catch (err) {
+      useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to delete campaign', 'error');
+    }
+  },
+
+  offerQRs: [],
+  addOfferQR: async (qr) => {
+    try {
+      const created = await apiCreate<any>('offer-qrs', {
+        name: qr.name,
+        type: qr.type,
+        offer: qr.offer || '',
+        thankYouMessage: qr.thankYouMessage || '',
+        homeScreenMessage: qr.homeScreenMessage || '',
+        isActive: qr.isActive ? 1 : 0,
+        printPos: qr.printPos ? 1 : 0,
+        printOnline: qr.printOnline ? 1 : 0,
+      });
+      set((state) => ({
+        offerQRs: [
+          ...state.offerQRs,
+          {
+            id: String(created.id),
+            name: created.name,
+            type: created.type,
+            offer: created.offer || '',
+            thankYouMessage: created.thankYouMessage || '',
+            homeScreenMessage: created.homeScreenMessage || '',
+            isActive: !!created.isActive,
+            printPos: !!created.printPos,
+            printOnline: !!created.printOnline,
+          },
+        ],
+      }));
+    } catch (err) {
+      useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to add offer QR', 'error');
+    }
+  },
+  updateOfferQR: async (id, qr) => {
+    try {
+      const body: any = { ...qr };
+      if (qr.isActive !== undefined) body.isActive = qr.isActive ? 1 : 0;
+      if (qr.printPos !== undefined) body.printPos = qr.printPos ? 1 : 0;
+      if (qr.printOnline !== undefined) body.printOnline = qr.printOnline ? 1 : 0;
+      await apiUpdate<any>('offer-qrs', Number(id), body);
+      set((state) => ({
+        offerQRs: state.offerQRs.map((q) => (q.id === id ? { ...q, ...qr } : q)),
+      }));
+    } catch (err) {
+      useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to update offer QR', 'error');
+    }
+  },
+  deleteOfferQR: async (id) => {
+    try {
+      await apiDelete('offer-qrs', Number(id));
+      set((state) => ({ offerQRs: state.offerQRs.filter((q) => q.id !== id) }));
+    } catch (err) {
+      useStore.getState().addToast(err instanceof Error ? err.message : 'Failed to delete offer QR', 'error');
     }
   },
 
@@ -709,6 +963,7 @@ export const useStore = create<AppState>((set) => ({
             totalSpend: Number(created.totalSpend || 0),
             totalOrders: Number(created.totalOrders || 0),
             balance: Number(created.balance || 0),
+            visits: Number(created.visits || 0),
           },
         ],
       }));

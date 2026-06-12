@@ -14,7 +14,7 @@ declare global {
   var __sobos_schema__: number | undefined;
 }
 
-const SCHEMA_VERSION = 6;
+const SCHEMA_VERSION = 7;
 
 function createConnection(): Database.Database {
   if (!fs.existsSync(DATA_DIR)) {
@@ -428,11 +428,60 @@ function migrateV6(db: Database.Database) {
   seedLoginUsers(db);
 }
 
+function migrateV7(db: Database.Database) {
+  // Alter booklets table if needed
+  addColumnIfMissing(db, 'booklets', 'redemption_interval', 'INTEGER NOT NULL DEFAULT 0');
+  addColumnIfMissing(db, 'booklets', 'is_active', 'INTEGER NOT NULL DEFAULT 0');
+  addColumnIfMissing(db, 'booklets', 'offers', "TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(db, 'booklets', 'amount', 'REAL NOT NULL DEFAULT 0');
+
+  // Create offer_qrs table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS offer_qrs (
+      id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+      name                TEXT NOT NULL,
+      type                TEXT NOT NULL DEFAULT 'With Offer',
+      offer               TEXT NOT NULL DEFAULT '',
+      thank_you_message   TEXT NOT NULL DEFAULT '',
+      home_screen_message TEXT NOT NULL DEFAULT '',
+      is_active           INTEGER NOT NULL DEFAULT 0,
+      print_pos           INTEGER NOT NULL DEFAULT 0,
+      print_online        INTEGER NOT NULL DEFAULT 0
+    );
+  `);
+
+  // Create campaigns table (covers offers, loyalty plans, redemptions)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS campaigns (
+      id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+      campaign_category   TEXT NOT NULL DEFAULT 'offer', -- 'offer', 'loyalty_plan', 'redemption'
+      name                TEXT NOT NULL,
+      description         TEXT NOT NULL DEFAULT '',
+      promocode           TEXT NOT NULL DEFAULT '',
+      type                TEXT NOT NULL DEFAULT 'BOGO',
+      start_date          TEXT NOT NULL,
+      end_date            TEXT NOT NULL,
+      is_active           INTEGER NOT NULL DEFAULT 0,
+      starting_from       TEXT NOT NULL DEFAULT '12:00 AM',
+      ending_at           TEXT NOT NULL DEFAULT '11:59 PM',
+      applicable_days     TEXT NOT NULL DEFAULT 'Sun,Mon,Tue,Wed,Thu,Fri,Sat',
+      redeem_limit        INTEGER,
+      customer_limit      INTEGER,
+      reset_frequency     TEXT,
+      reset_limit         INTEGER,
+      conditions          TEXT DEFAULT '',
+      category_limit      TEXT DEFAULT '',
+      item_limit          TEXT DEFAULT ''
+    );
+  `);
+}
+
 function migrate(db: Database.Database) {
   migrateBase(db);
   migrateV3(db);
   migrateV4(db);
   migrateV6(db);
+  migrateV7(db);
 }
 
 export function getDb(): Database.Database {

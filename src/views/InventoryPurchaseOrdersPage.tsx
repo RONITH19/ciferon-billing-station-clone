@@ -94,7 +94,7 @@ export const InventoryPurchaseOrdersPage: React.FC = () => {
     setCreatedOn(po.createdOn);
     setExpectedDeliveryDate(po.expectedDeliveryDate);
     setTotalAmount(po.totalAmount);
-    setStatus(po.status);
+    setStatus(po.status as 'PO Generated' | 'Send' | 'Pending');
     setIsModalOpen(true);
   };
 

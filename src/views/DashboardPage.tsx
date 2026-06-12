@@ -211,7 +211,7 @@ export const DashboardPage: React.FC = () => {
                   </div>
                   {currentOutlet && (
                     <span className="text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1 rounded-xl">
-                      {currentOutlet.name}
+                      {currentOutlet}
                     </span>
                   )}
                 </div>

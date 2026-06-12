@@ -1,20 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useStore } from '../store';
+import { useStore, Campaign } from '../store';
 import { SubSidebar } from '../components/SubSidebar';
 import { PageHeader } from '../components/PageHeader';
 import { DataTable, Column } from '../components/DataTable';
 import { offersSidebarSections } from './BookletsPage';
 import { ArrowLeft, Plus, Calendar, Send, Check } from 'lucide-react';
-
-interface Campaign {
-  id: string;
-  name: string;
-  promocode: string;
-  type: string;
-  startDate: string;
-  endDate: string;
-  status: 'Active' | 'Inactive';
-}
 
 // STANDALONE CUSTOM CALENDAR COMPONENT
 const CalendarPicker: React.FC<{
@@ -136,28 +126,11 @@ const CalendarPicker: React.FC<{
 };
 
 export const OffersListPage: React.FC = () => {
-  const { addToast } = useStore();
+  const { campaigns, addCampaign, deleteCampaign, addToast } = useStore();
   const [isCreating, setIsCreating] = useState(false);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([
-    {
-      id: '1',
-      name: 'Summer general discount',
-      promocode: 'SUMMER20',
-      type: 'GENERAL DISCOUNT',
-      startDate: '10-Jun-2026',
-      endDate: '30-Jun-2026',
-      status: 'Active'
-    },
-    {
-      id: '2',
-      name: 'BOGO Buy 1 Get 1 Pizzas',
-      promocode: 'BOGOPZ',
-      type: 'BOGO',
-      startDate: '01-Jun-2026',
-      endDate: '15-Jun-2026',
-      status: 'Active'
-    }
-  ]);
+
+  // Filter campaigns of category 'offer'
+  const offers = campaigns.filter((c) => c.campaignCategory === 'offer');
 
   // Form State
   const [schemeName, setSchemeName] = useState('');
@@ -208,38 +181,62 @@ export const OffersListPage: React.FC = () => {
     return `${day}/${month}/${year}`; // e.g. 11/06/2026
   };
 
-  const handleSaveCampaign = (e: React.FormEvent) => {
+  const handleSaveCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!schemeName.trim()) {
       addToast('Scheme name is required', 'warning');
       return;
     }
 
-    const newCampaign: Campaign = {
-      id: Math.random().toString(36).substring(2, 9),
-      name: schemeName.trim(),
-      promocode: promoCode.trim() || 'NONE',
-      type: campaignType,
-      startDate: formatDate(startDate),
-      endDate: formatDate(endDate),
-      status: isActive ? 'Active' : 'Inactive'
-    };
+    try {
+      await addCampaign({
+        campaignCategory: 'offer',
+        name: schemeName.trim(),
+        promocode: promoCode.trim() || 'NONE',
+        type: campaignType,
+        startDate: formatDate(startDate),
+        endDate: formatDate(endDate),
+        isActive: isActive,
+        description: description.trim(),
+        startingFrom: '12:00 AM',
+        endingAt: '11:59 PM',
+        applicableDays: activeDays.join(','),
+        redeemLimit: redeemLimit ? Number(redeemLimit) : undefined,
+        customerLimit: customerLimit ? Number(customerLimit) : undefined,
+        resetFrequency: '',
+        resetLimit: undefined,
+        conditions: '',
+        categoryLimit: '',
+        itemLimit: '',
+      });
+      addToast(`Campaign "${schemeName}" saved successfully`, 'success');
+      setIsCreating(false);
 
-    setCampaigns([newCampaign, ...campaigns]);
-    addToast(`Campaign "${newCampaign.name}" saved successfully`, 'success');
-    setIsCreating(false);
+      // Reset Form
+      setSchemeName('');
+      setPromoCode('');
+      setDescription('');
+      setCampaignType('BOGO');
+      setStartDate(new Date(2026, 5, 11));
+      setEndDate(new Date(2026, 5, 11));
+      setIsClubbed(false);
+      setIsMultiApply(false);
+      setIsBooklet(false);
+      setIsActive(true);
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Failed to save campaign', 'error');
+    }
+  };
 
-    // Reset Form
-    setSchemeName('');
-    setPromoCode('');
-    setDescription('');
-    setCampaignType('BOGO');
-    setStartDate(new Date(2026, 5, 11));
-    setEndDate(new Date(2026, 5, 11));
-    setIsClubbed(false);
-    setIsMultiApply(false);
-    setIsBooklet(false);
-    setIsActive(true);
+  const handleDeleteCampaign = async (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete campaign "${name}"?`)) {
+      try {
+        await deleteCampaign(id);
+        addToast(`Campaign "${name}" deleted successfully`, 'success');
+      } catch (err) {
+        addToast(err instanceof Error ? err.message : 'Failed to delete campaign', 'error');
+      }
+    }
   };
 
   const toggleDay = (day: string) => {
@@ -276,15 +273,25 @@ export const OffersListPage: React.FC = () => {
     },
     {
       header: 'Status',
-      accessor: 'status',
       render: (row) => (
         <span
           className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-            row.status === 'Active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+            row.isActive ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
           }`}
         >
-          {row.status}
+          {row.isActive ? 'Active' : 'Inactive'}
         </span>
+      )
+    },
+    {
+      header: 'Action',
+      render: (row) => (
+        <button
+          onClick={() => handleDeleteCampaign(row.id, row.name)}
+          className="text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors"
+        >
+          Delete
+        </button>
       )
     }
   ];
@@ -307,7 +314,7 @@ export const OffersListPage: React.FC = () => {
             </PageHeader>
             <DataTable
               columns={columns}
-              data={campaigns}
+              data={offers}
               searchPlaceholder="Search campaigns..."
               searchKey="name"
             />

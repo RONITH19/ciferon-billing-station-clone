@@ -100,7 +100,7 @@ export const InventoryPurchaseInvoicesPage: React.FC = () => {
     setCreatedOn(inv.createdOn);
     setPaymentDueDate(inv.paymentDueDate);
     setGrandTotal(inv.grandTotal);
-    setStatus(inv.status);
+    setStatus(inv.status as 'Received' | 'Pending' | 'Draft');
     setIsModalOpen(true);
   };
 

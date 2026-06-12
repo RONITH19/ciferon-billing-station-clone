@@ -23,11 +23,19 @@ import { StockViewPage } from './views/StockViewPage';
 import { ExpiryItemDetailsPage } from './views/ExpiryItemDetailsPage';
 import { InventorySettingsPage } from './views/InventorySettingsPage';
 import { BookletsPage } from './views/BookletsPage';
+import { CreateBookletPage } from './views/CreateBookletPage';
 import { OffersLandingPage } from './views/OffersLandingPage';
 import { OffersListPage } from './views/OffersListPage';
+import { OffersQRListPage } from './views/OffersQRListPage';
+import { CreateEditOfferQRPage } from './views/CreateEditOfferQRPage';
+import { LoyaltyPlansPage } from './views/LoyaltyPlansPage';
+import { CreateLoyaltyPlanPage } from './views/CreateLoyaltyPlanPage';
+import { LoyaltyRedemptionPage } from './views/LoyaltyRedemptionPage';
+import { CreateLoyaltyRedemptionPage } from './views/CreateLoyaltyRedemptionPage';
 import { ScanAndOrderPage } from './views/ScanAndOrderPage';
 import { LoyaltySettingsPage } from './views/LoyaltySettingsPage';
 import { FeedbackCommentsPage } from './views/FeedbackCommentsPage';
+import { FeedbackInsightsPage } from './views/FeedbackInsightsPage';
 import { ReportsPage } from './views/ReportsPage';
 import { MessageSettingsPage } from './views/MessageSettingsPage';
 import { POSSettingsPage } from './views/POSSettingsPage';
@@ -119,7 +127,16 @@ const router = createHashRouter([
       { path: 'offers', element: <OffersLandingPage /> },
       { path: 'offers/list', element: <OffersListPage /> },
       { path: 'offers/bookletlist', element: <BookletsPage /> },
+      { path: 'offers/bookletlist/new', element: <CreateBookletPage /> },
+      { path: 'offers/qr', element: <OffersQRListPage /> },
+      { path: 'offers/qr/new', element: <CreateEditOfferQRPage /> },
+      { path: 'offers/qr/edit/:id', element: <CreateEditOfferQRPage /> },
+      { path: 'loyalty/plans', element: <LoyaltyPlansPage /> },
+      { path: 'loyalty/plans/new', element: <CreateLoyaltyPlanPage /> },
+      { path: 'loyalty/redemption', element: <LoyaltyRedemptionPage /> },
+      { path: 'loyalty/redemption/new', element: <CreateLoyaltyRedemptionPage /> },
       { path: 'loyalty/setting', element: <LoyaltySettingsPage /> },
+      { path: 'feedback/insights', element: <FeedbackInsightsPage /> },
       { path: 'feedback/comments', element: <FeedbackCommentsPage /> },
 
       // Scan and Order

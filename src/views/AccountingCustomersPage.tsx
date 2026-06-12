@@ -96,6 +96,7 @@ export const AccountingCustomersPage: React.FC = () => {
         totalSpend: spend,
         totalOrders: orders,
         balance,
+        visits: orders,
       };
       addAccountingCustomer(newCust);
       addToast('Customer record created successfully', 'success');
