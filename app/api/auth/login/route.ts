@@ -23,32 +23,40 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Please enter your password.' }, { status: 400 });
   }
 
-  const db = getDb();
-  db.prepare('INSERT OR IGNORE INTO users (email, password_hash) VALUES (?, ?)').run(
-    email,
-    bcrypt.hashSync(DEMO_PASSWORD, 10),
-  );
-
-  const user = db.prepare('SELECT password_hash FROM users WHERE email = ?').get(email) as
-    | { password_hash: string }
-    | undefined;
-
-  const hash = user?.password_hash ?? '';
-  const valid =
-    !hash || bcrypt.compareSync(password, hash) || password === DEMO_PASSWORD;
-
-  if (!valid) {
-    return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
-  }
-
-  if (!hash) {
-    db.prepare('UPDATE users SET password_hash = ? WHERE email = ?').run(
-      bcrypt.hashSync(password, 10),
+  try {
+    const db = getDb();
+    db.prepare('INSERT OR IGNORE INTO users (email, password_hash) VALUES (?, ?)').run(
       email,
+      bcrypt.hashSync(DEMO_PASSWORD, 10),
+    );
+
+    const user = db.prepare('SELECT password_hash FROM users WHERE email = ?').get(email) as
+      | { password_hash: string }
+      | undefined;
+
+    const hash = user?.password_hash ?? '';
+    const valid =
+      !hash || bcrypt.compareSync(password, hash) || password === DEMO_PASSWORD;
+
+    if (!valid) {
+      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
+    }
+
+    if (!hash) {
+      db.prepare('UPDATE users SET password_hash = ? WHERE email = ?').run(
+        bcrypt.hashSync(password, 10),
+        email,
+      );
+    }
+
+    await setSession(email);
+    logAudit(db, 'login', 'user', email, email);
+    return NextResponse.json({ ok: true, email });
+  } catch (error) {
+    console.error('POST /api/auth/login failed:', error);
+    return NextResponse.json(
+      { error: 'Login service is temporarily unavailable. Please try again.' },
+      { status: 500 },
     );
   }
-
-  await setSession(email);
-  logAudit(db, 'login', 'user', email, email);
-  return NextResponse.json({ ok: true, email });
 }

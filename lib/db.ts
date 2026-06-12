@@ -4,8 +4,16 @@ import Database from 'better-sqlite3';
 import { seedDatabase } from './seed';
 import { seedLoginUsers } from './demo-users';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_PATH = path.join(DATA_DIR, 'sobos.db');
+function resolveDataDir(): string {
+  if (process.env.SOBOS_DB_DIR) {
+    return process.env.SOBOS_DB_DIR;
+  }
+  // Vercel/Lambda only allow writes under /tmp.
+  if (process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join('/tmp', 'sobos-data');
+  }
+  return path.join(process.cwd(), 'data');
+}
 
 declare global {
   // eslint-disable-next-line no-var
@@ -17,12 +25,17 @@ declare global {
 const SCHEMA_VERSION = 7;
 
 function createConnection(): Database.Database {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  const dataDir = resolveDataDir();
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  const db = new Database(DB_PATH);
-  db.pragma('journal_mode = WAL');
+  const dbPath = path.join(dataDir, 'sobos.db');
+  const db = new Database(dbPath);
+  // WAL creates extra files; use the default journal mode on serverless.
+  if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    db.pragma('journal_mode = WAL');
+  }
   db.pragma('foreign_keys = ON');
   return db;
 }
